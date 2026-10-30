@@ -1,0 +1,10 @@
+# 搜孔参数由 s622_dual_assembly/config/planar_search.yaml 统一管理。
+bool execute
+---
+bool success
+string reason
+float64 final_radius
+---
+string phase
+float64 radius
+float64 force_y

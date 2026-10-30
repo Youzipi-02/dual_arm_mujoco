@@ -1,0 +1,73 @@
+# MuJoCo contact grasp: account for the measured 1.73 mm zero-position pad gap,
+# then command roughly 1 mm of preload per finger against each workpiece.
+/**:
+  ros__parameters:
+    frames.planning: world
+    frames.left_eef: left_grasp_frame
+    frames.right_eef: right_grasp_frame
+    wire.model_pose:
+    - -0.23
+    - 0.35
+    - 0.7566
+    - 0.0
+    - 0.70710678
+    - 0.0
+    - 0.70710678
+    wire.radius: 0.0035
+    wire.length: 0.06
+    terminal.model_pose:
+    - 0.23
+    - 0.35
+    - 0.7606
+    - 0.0
+    - 0.70710678
+    - 0.0
+    - 0.70710678
+    terminal.outer_radius: 0.0075
+    terminal.inner_radius: 0.0055
+    terminal.length: 0.03
+    gripper.open:
+    - 0.025
+    - -0.025
+    gripper.wire_closed:
+    - 0.0015
+    - -0.0015
+    gripper.terminal_closed:
+    - 0.0055
+    - -0.0055
+    left_arm.home:
+    - 1.04719755
+    - -1.57079633
+    - 1.57079633
+    - -1.57079633
+    - -1.57079633
+    - 0.0
+    right_arm.home:
+    - -1.3275199
+    - -1.98157239
+    - 1.85895165
+    - -1.4445118
+    - -1.57079633
+    - 0.0
+    wire.stage_joints:
+    - 1.6323899164862492
+    - -1.635794933
+    - 1.5977625404
+    - -1.69630233
+    - -1.51914448
+    - 0.0
+    terminal.stage_joints:
+    - -1.791419515715895
+    - -1.981591283304764
+    - 1.8589171688959674
+    - -1.4446190458491657
+    - -1.5707164742442699
+    - 0.0
+    safety.clearance_guard.center:
+    - 0.0
+    - 0.2
+    - 0.79
+    safety.clearance_guard.size:
+    - 0.56
+    - 0.6
+    - 0.08

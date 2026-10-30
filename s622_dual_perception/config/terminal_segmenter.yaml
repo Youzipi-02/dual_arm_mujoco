@@ -1,0 +1,66 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    model.path: ""
+    model.device: ""
+    # yolo_seg.pt 中内嵌的真实类别名称。
+    model.hole_class: "hole"
+    model.face_class: "terminal_face"
+    model.confidence: 0.30
+    model.iou: 0.50
+    model.image_size: 640
+    model.max_detections: 10
+
+    input.rgb_topic: "/cameras/left_camera/rgb/image_raw"
+    input.depth_topic: "/cameras/left_camera/depth/image_raw"
+    input.camera_info_topic: "/cameras/left_camera/rgb/camera_info"
+    synchronization.queue_size: 10
+    synchronization.slop: 0.03
+
+    mask.threshold: 0.50
+    mask.opening_kernel_px: 3
+    mask.closing_kernel_px: 5
+    # 640x480 预对接画面中端面是约 85px 的薄环，避免把真实小目标过滤掉。
+    mask.minimum_hole_area_px: 20.0
+    mask.minimum_face_area_px: 30.0
+
+    # 优先使用端面凸包包含关系；分割不完整时允许近邻和扩展框回退。
+    # terminal_face 是薄环掩膜，面积可小于填充状的 hole 掩膜。
+    pairing.maximum_hole_to_face_area_ratio: 5.0
+    pairing.face_margin_ratio: 0.25
+    pairing.maximum_center_distance_ratio: 1.25
+
+    depth.minimum_m: 0.08
+    depth.maximum_m: 1.50
+    depth.minimum_valid_ratio: 0.20
+    # 直接在完整端面掩膜中保留最密集的 20mm 宽深度簇；其中值作为孔中心深度。
+    depth.cluster_tolerance_m: 0.010
+    depth.minimum_cluster_ratio: 0.35
+
+    tf.target_frame: "world"
+    tf.lookup_timeout: 0.10
+
+    stability.minimum_samples: 5
+    stability.confirm_duration: 0.50
+    stability.maximum_gap: 0.20
+    stability.maximum_position_range_m: 0.003
+
+    # 只用于 RViz 显示的孔中心参考蓝点；不加入 MoveIt PlanningScene。
+    visualization.hole_center_marker_diameter_m: 0.006
+
+    output.detections_2d_topic: "/s622_dual_perception/left_camera/features_2d"
+    output.hole_center_topic: "/s622_dual_perception/left_camera/hole_center"
+    output.hole_mask_topic: "/s622_dual_perception/left_camera/hole_mask"
+    output.face_mask_topic: "/s622_dual_perception/left_camera/end_face_mask"
+    output.debug_image_topic: "/s622_dual_perception/left_camera/debug_image"
+    output.markers_topic: "/s622_dual_perception/left_camera/markers"
+    output.publish_debug_image: true
+
+    # launch 时加载模型但不推理；进入 DUAL_PREDOCK 后由 FSM 开启。
+    inference.enabled: false
+    inference.max_rate_hz: 10.0
+    inference.verbose: false
+    control.enable_service: "/s622_dual_perception/left_camera/set_enabled"
+    control.reset_stability_service: "/s622_dual_perception/left_camera/reset_stability"
+    logging.summary_interval: 30

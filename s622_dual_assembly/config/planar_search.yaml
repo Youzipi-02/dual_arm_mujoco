@@ -1,0 +1,64 @@
+/planar_search_node:
+  ros__parameters:
+    # 搜孔控制循环频率，单位 Hz。
+    update_rate_hz: 200.0
+
+    # 速度命令和接触力采用的末端夹持坐标系。
+    command_frame: right_grasp_frame
+    # 六维力传感器原始测量所在的坐标系。
+    sensor_frame: right_ft_sensor_link
+    # 力数据方向修正系数，只允许 1.0 或 -1.0。
+    wrench_sign: 1.0
+
+    # 对外提供的平面搜孔 Action 名称。
+    action_name: /planar_search
+    # 右臂滤波后六维力输入话题。
+    wrench_topic: /right_ft_sensor_processing/wrench_filtered
+    # 发送给右臂导纳控制器的名义速度话题。
+    velocity_topic: /right_admittance/nominal_velocity_command
+    # 右臂导纳控制器状态反馈话题。
+    status_topic: /right_admittance/status
+    # 动态配置名义速度和期望接触力的服务。
+    configure_service: /right_admittance/configure
+    # 协调启停右臂导纳和笛卡尔跟随器的服务。
+    enable_service: /right_admittance/enable
+
+    # 所有距离、速度和时间分别使用 m、m/s 和 s。
+    # 阿基米德螺线相邻两圈的径向间距。
+    spacing: 0.001
+    # XZ 搜索平面内的目标切向速度。
+    tangential_speed: 0.001
+    # 允许搜索的最大螺线半径。
+    max_radius: 0.020
+    # 一次搜孔从启动到结束的总超时时间。
+    timeout: 60.0
+
+    # 建立接触前沿夹爪 +Z 的偏移距离；0 表示不偏移。
+    contact_offset_z: 0.0
+
+    # 末端沿夹爪 -Y 接触，环境反作用力为夹爪 +Fy。
+    # 未接触时沿夹爪 -Y 的名义靠近速度。
+    approach_speed: 0.001
+    # 未检测到接触时允许的最大名义靠近距离。
+    max_approach_distance: 0.1
+    # 建立接触后导纳控制的目标 +Fy。
+    desired_contact_force: 2.0
+    # 判定已接触平面的最低 +Fy。
+    contact_threshold: 1.0
+    # 搜索中判定进入孔口的最高 +Fy，必须小于接触阈值。
+    hole_force_threshold: 0.5
+    # 接触力连续稳定后开始螺线搜索的等待时间。
+    contact_stable_duration: 1.0
+    # 低力状态连续保持多久才确认找到孔口。
+    hole_confirm_duration: 0.1
+
+    # 允许的最大合力，用于碰撞和异常接触保护。
+    force_limit: 20.0
+    # 允许的最大合力矩，用于异常接触保护。
+    torque_limit: 2.0
+    # 六维力样本允许的最大数据年龄。
+    wrench_timeout: 0.05
+    # 导纳 RUNNING 状态反馈允许的最大数据年龄。
+    status_timeout: 0.5
+    # 等待配置和启停服务响应的最长时间。
+    service_timeout: 3.0

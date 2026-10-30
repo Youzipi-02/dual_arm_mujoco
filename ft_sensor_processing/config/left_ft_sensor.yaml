@@ -1,0 +1,41 @@
+/right_ft_sensor_processing/wrench_processor:
+  ros__parameters:
+    gravity_frame: world
+    sensor_frame: right_ft_sensor_link
+
+    # 标定负载
+    payload:
+      weight_N: 4.53427029
+      com_m: [0.000001216, 0.000000222, 0.008940]
+
+    # 零偏
+    bias:
+      force_N: [0.0, 0.0, 0.0]
+      torque_Nm: [0.0, 0.0, 0.0]
+
+    filter:
+      enabled: true
+      sampling_frequency_Hz: 500.0
+      cutoff_frequency_Hz: 20.0
+      order: 2
+
+    tf:
+      update_rate_Hz: 250.0
+      max_age_sec: 0.02
+
+    tare:
+      window_samples: 250
+      max_force_std_N: 0.10
+      max_torque_std_Nm: 0.01
+      max_joint_velocity_rad_s: 0.01
+      joint_state_timeout_sec: 0.20
+      joint_names:
+        - left_j1
+        - left_j2
+        - left_j3
+        - left_j4
+        - left_j5
+        - left_j6
+
+    diagnostics:
+      period_sec: 1.0

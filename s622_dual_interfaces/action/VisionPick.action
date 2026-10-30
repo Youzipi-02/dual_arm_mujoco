@@ -1,0 +1,12 @@
+# Execution also requires the server's pick.execute parameter.
+bool execute
+---
+bool success
+string error_code
+string reason
+# Conservative flags: a close command may have held an object. Not contact sensing.
+bool left_holding
+bool right_holding
+---
+string phase
+string detail

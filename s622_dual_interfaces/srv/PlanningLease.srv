@@ -1,0 +1,6 @@
+# A persistent owner prevents compliant control and other planners from overlapping.
+string owner
+bool acquire
+---
+bool success
+string message

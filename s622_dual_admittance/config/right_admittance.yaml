@@ -1,0 +1,53 @@
+/right_admittance/admittance_controller:
+  ros__parameters:
+    control_rate_hz: 200.0
+
+    sensor_frame: right_ft_sensor_link
+    grasp_frame: right_grasp_frame
+    reference_frame: world
+    wrench_timeout_sec: 0.1
+    velocity_command_timeout_sec: 0.10
+
+    # 平面搜孔只沿夹爪 Y 轴做力反馈修正；名义 XZ 螺线仍可正常积分。
+    enabled_axes:
+      [false, true, false, false, false, false]
+
+    # 虚拟质量矩阵 M_d（6个对角元素）
+    mass: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+    # 单位：kg（平移）、kgm²（旋转）
+    # 物理含义：外力作用下末端的"惯性感"
+    # 越大→加速越慢→响应越缓→越稳定
+
+    # 阻尼 
+    damping: [178.88, 89.44, 178.88, 89.44, 89.44, 89.44]
+    # 无量纲。实际阻尼 D = 2ζ√(MK)
+    # ζ = 1.0：临界阻尼
+    # ζ = 2.828 ≈ 2√2：过阻尼（推荐用于工业导纳——更稳定）
+
+    # 刚度矩阵 K_d（6个对角元素）
+    stiffness: [200.0, 50.0, 200.0, 50.0, 50.0, 50.0]
+    # stiffness: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # 单位：N/m（平移）、Nm/rad（旋转）
+    # K = 0 → 纯导纳（无弹簧回复力）→ 零力引导模式
+
+
+    deadband:
+      [0.3, 0.3, 0.3, 0.02, 0.02, 0.02]
+
+    max_velocity:
+      [0.01, 0.02, 0.01, 0.15, 0.15, 0.15]
+
+    max_displacement:
+      [0.015, 0.015, 0.015, 0.087, 0.087, 0.087]
+
+    wrench_sign: 1.0
+
+
+# ----------------测试使用的参数-----------------
+    # 最大导纳修正速度：m/s 和 rad/s
+    # max_velocity:
+    #   [0.5, 0.5, 0.5, 0.15, 0.15, 0.15]
+
+    # # 最大导纳位移：m 和 rad
+    # max_displacement:
+    #   [1.0, 1.0, 1.0, 0.087, 0.087, 0.087]

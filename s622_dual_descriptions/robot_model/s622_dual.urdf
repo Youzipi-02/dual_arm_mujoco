@@ -1,0 +1,714 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="s622_dual_descriptions">
+  <link name="world"/>
+  <joint name="world_to_dual_base" type="fixed">
+    <origin xyz="0 0 0.753" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="dual_base"/>
+  </joint>
+  <!-- Central reference frame for the two arm mounts. -->
+  <link name="dual_base"/>
+  <joint name="left_base_mount_joint" type="fixed">
+    <origin xyz="-0.4 0 0" rpy="0 0 3.141592653589793"/>
+    <parent link="dual_base"/>
+    <child link="left_base_link"/>
+  </joint>
+  <link name="left_base_link">
+    <inertial>
+      <origin xyz="-0.00049027 -0.00045095 0.032527" rpy="0 0 0"/>
+      <mass value="0.29035"/>
+      <inertia ixx="0.00051309" ixy="4.2426E-06" ixz="-3.9414E-06" iyy="0.00051293" iyz="-3.6087E-06" izz="0.00073224"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="left_shoulder_link">
+    <inertial>
+      <origin xyz="-2.8223E-07 -0.0024164 0.13521" rpy="0 0 0"/>
+      <mass value="0.78648"/>
+      <inertia ixx="0.0012306" ixy="-1.8019E-08" ixz="-4.8572E-09" iyy="0.0012007" iyz="1.621E-05" izz="0.00085665"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/shoulder_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/shoulder_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j1" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="left_base_link"/>
+    <child link="left_shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_upperarm_link">
+    <inertial>
+      <origin xyz="-0.14 -3.2998E-09 0.1117" rpy="0 0 0"/>
+      <mass value="2.774"/>
+      <inertia ixx="0.0038584" ixy="5.6311E-09" ixz="7.0604E-09" iyy="0.037026" iyz="3.4667E-10" izz="0.036047"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/upperarm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/upperarm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j2" type="revolute">
+    <origin xyz="0 0 0.14" rpy="1.5708 0 0"/>
+    <parent link="left_shoulder_link"/>
+    <child link="left_upperarm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-4.6251" upper="1.4835" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="1.4835" soft_lower_limit="-4.6251" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_forearm_link">
+    <inertial>
+      <origin xyz="-0.12829 3.461E-07 0.004504" rpy="0 0 0"/>
+      <mass value="1.8066"/>
+      <inertia ixx="0.0018648" ixy="-8.4793E-08" ixz="-0.00054453" iyy="0.016897" iyz="5.6265E-09" izz="0.01656"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/forearm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/forearm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j3" type="revolute">
+    <origin xyz="-0.28 0 0" rpy="0 0 0"/>
+    <parent link="left_upperarm_link"/>
+    <child link="left_forearm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.8274" upper="2.8274" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="2.8274" soft_lower_limit="-2.8274" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_wrist1_link">
+    <inertial>
+      <origin xyz="2.7977E-07 -0.00344 0.098294" rpy="0 0 0"/>
+      <mass value="0.59151"/>
+      <inertia ixx="0.0007449" ixy="3.5335E-10" ixz="1.3551E-08" iyy="0.00053793" iyz="1.2039E-05" izz="0.00070651"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j4" type="revolute">
+    <origin xyz="-0.24001 0 0" rpy="0 0 0"/>
+    <parent link="left_forearm_link"/>
+    <child link="left_wrist1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-4.6251" upper="1.4835" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="1.4835" soft_lower_limit="-4.6251" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_wrist2_link">
+    <inertial>
+      <origin xyz="-2.7639E-07 0.00344 0.098294" rpy="0 0 0"/>
+      <mass value="0.59151"/>
+      <inertia ixx="0.0007449" ixy="3.5282E-10" ixz="-1.3542E-08" iyy="0.00053793" iyz="-1.2039E-05" izz="0.00070651"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j5" type="revolute">
+    <origin xyz="0 0 0.102" rpy="1.5708 0 0"/>
+    <parent link="left_wrist1_link"/>
+    <child link="left_wrist2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_wrist3_link">
+    <inertial>
+      <origin xyz="3.9215E-05 7.1906E-06 0.089452" rpy="0 0 0"/>
+      <mass value="0.38464"/>
+      <inertia ixx="0.00019393" ixy="1.5604E-09" ixz="-5.1438E-08" iyy="0.00019407" iyz="6.707E-08" izz="0.00032446"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist3_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.66667 0.69804 0.76863 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist3_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_j6" type="revolute">
+    <origin xyz="0 0 0.102" rpy="-1.5708 0 0"/>
+    <parent link="left_wrist2_link"/>
+    <child link="left_wrist3_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="left_ft_sensor_link">
+    <inertial>
+      <origin xyz="-1.1102E-16 0 2.7756E-17" rpy="0 0 0"/>
+      <mass value="0.40124"/>
+      <inertia ixx="0.00019239" ixy="2.7997E-09" ixz="7.293E-21" iyy="0.00019206" iyz="2.6022E-21" izz="0.00032476"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/ft_sensor_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.89804 0.91765 0.92941 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/ft_sensor_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_ft_sensor_joint" type="fixed">
+    <origin xyz="0 0 0.12493" rpy="0 0 0"/>
+    <parent link="left_wrist3_link"/>
+    <child link="left_ft_sensor_link"/>
+  </joint>
+  <link name="left_gripper_base_link">
+    <inertial>
+      <origin xyz="1.2975E-05 2.3049E-06 0.038402" rpy="0 0 0"/>
+      <mass value="0.043317"/>
+      <inertia ixx="1.0086E-05" ixy="-6.2403E-09" ixz="2.9549E-08" iyy="1.2273E-05" iyz="-7.8931E-09" izz="5.9319E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/gripper_base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/gripper_base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_gripper_base_joint" type="fixed">
+    <origin xyz="0 0 0.014066" rpy="0 0 0"/>
+    <parent link="left_ft_sensor_link"/>
+    <child link="left_gripper_base_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <link name="left_finger1">
+    <inertial>
+      <origin xyz="0.00067584 0.03547 -5.8981E-06" rpy="0 0 0"/>
+      <mass value="0.008826"/>
+      <inertia ixx="1.5494E-06" ixy="5.248E-07" ixz="3.4585E-09" iyy="9.8473E-07" iyz="-4.5799E-09" izz="1.9457E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_finger1_joint" type="prismatic">
+    <origin xyz="-0.0099996 -8.7267E-05 0.0558" rpy="1.5708 0 3.1416"/>
+    <parent link="left_gripper_base_link"/>
+    <child link="left_finger1"/>
+    <axis xyz="0.99996 0 -0.0087267"/>
+    <limit lower="0" upper="0.0305" effort="150" velocity="0.2"/>
+  </joint>
+  <link name="left_finger2">
+    <inertial>
+      <origin xyz="-0.00067584 0.03547 5.8981E-06" rpy="0 0 0"/>
+      <mass value="0.008826"/>
+      <inertia ixx="1.5494E-06" ixy="-5.248E-07" ixz="3.4585E-09" iyy="9.8473E-07" iyz="4.5799E-09" izz="1.9457E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_finger2_joint" type="prismatic">
+    <origin xyz="0.0099996 8.7267E-05 0.0558" rpy="1.5708 0 3.1416"/>
+    <parent link="left_gripper_base_link"/>
+    <child link="left_finger2"/>
+    <axis xyz="0.99996 0 -0.0087267"/>
+    <limit lower="-0.0305" upper="0" effort="150" velocity="0.2"/>
+  </joint>
+  <!-- The closed-jaw contact faces span z=0.0923..0.1173 m in the gripper base frame. -->
+  <link name="left_grasp_frame"/>
+  <joint name="left_gripper_base_to_grasp_frame" type="fixed">
+    <origin xyz="0 0 0.1048" rpy="0 0 0"/>
+    <parent link="left_gripper_base_link"/>
+    <child link="left_grasp_frame"/>
+  </joint>
+  <joint name="right_base_mount_joint" type="fixed">
+    <origin xyz="0.4 0 0" rpy="0 0 0"/>
+    <parent link="dual_base"/>
+    <child link="right_base_link"/>
+  </joint>
+  <link name="right_base_link">
+    <inertial>
+      <origin xyz="-0.00049027 -0.00045095 0.032527" rpy="0 0 0"/>
+      <mass value="0.29035"/>
+      <inertia ixx="0.00051309" ixy="4.2426E-06" ixz="-3.9414E-06" iyy="0.00051293" iyz="-3.6087E-06" izz="0.00073224"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="right_shoulder_link">
+    <inertial>
+      <origin xyz="-2.8223E-07 -0.0024164 0.13521" rpy="0 0 0"/>
+      <mass value="0.78648"/>
+      <inertia ixx="0.0012306" ixy="-1.8019E-08" ixz="-4.8572E-09" iyy="0.0012007" iyz="1.621E-05" izz="0.00085665"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/shoulder_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/shoulder_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j1" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="right_base_link"/>
+    <child link="right_shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_upperarm_link">
+    <inertial>
+      <origin xyz="-0.14 -3.2998E-09 0.1117" rpy="0 0 0"/>
+      <mass value="2.774"/>
+      <inertia ixx="0.0038584" ixy="5.6311E-09" ixz="7.0604E-09" iyy="0.037026" iyz="3.4667E-10" izz="0.036047"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/upperarm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/upperarm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j2" type="revolute">
+    <origin xyz="0 0 0.14" rpy="1.5708 0 0"/>
+    <parent link="right_shoulder_link"/>
+    <child link="right_upperarm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-4.6251" upper="1.4835" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="1.4835" soft_lower_limit="-4.6251" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_forearm_link">
+    <inertial>
+      <origin xyz="-0.12829 3.461E-07 0.004504" rpy="0 0 0"/>
+      <mass value="1.8066"/>
+      <inertia ixx="0.0018648" ixy="-8.4793E-08" ixz="-0.00054453" iyy="0.016897" iyz="5.6265E-09" izz="0.01656"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/forearm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/forearm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j3" type="revolute">
+    <origin xyz="-0.28 0 0" rpy="0 0 0"/>
+    <parent link="right_upperarm_link"/>
+    <child link="right_forearm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.8274" upper="2.8274" effort="150" velocity="3.15"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="2.8274" soft_lower_limit="-2.8274" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_wrist1_link">
+    <inertial>
+      <origin xyz="2.7977E-07 -0.00344 0.098294" rpy="0 0 0"/>
+      <mass value="0.59151"/>
+      <inertia ixx="0.0007449" ixy="3.5335E-10" ixz="1.3551E-08" iyy="0.00053793" iyz="1.2039E-05" izz="0.00070651"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j4" type="revolute">
+    <origin xyz="-0.24001 0 0" rpy="0 0 0"/>
+    <parent link="right_forearm_link"/>
+    <child link="right_wrist1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-4.6251" upper="1.4835" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="1.4835" soft_lower_limit="-4.6251" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_wrist2_link">
+    <inertial>
+      <origin xyz="-2.7639E-07 0.00344 0.098294" rpy="0 0 0"/>
+      <mass value="0.59151"/>
+      <inertia ixx="0.0007449" ixy="3.5282E-10" ixz="-1.3542E-08" iyy="0.00053793" iyz="-1.2039E-05" izz="0.00070651"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j5" type="revolute">
+    <origin xyz="0 0 0.102" rpy="1.5708 0 0"/>
+    <parent link="right_wrist1_link"/>
+    <child link="right_wrist2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_wrist3_link">
+    <inertial>
+      <origin xyz="3.9215E-05 7.1906E-06 0.089452" rpy="0 0 0"/>
+      <mass value="0.38464"/>
+      <inertia ixx="0.00019393" ixy="1.5604E-09" ixz="-5.1438E-08" iyy="0.00019407" iyz="6.707E-08" izz="0.00032446"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist3_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.66667 0.69804 0.76863 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/wrist3_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_j6" type="revolute">
+    <origin xyz="0 0 0.102" rpy="-1.5708 0 0"/>
+    <parent link="right_wrist2_link"/>
+    <child link="right_wrist3_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="28" velocity="3.2"/>
+    <calibration rising="0" falling="0"/>
+    <dynamics damping="0" friction="0"/>
+    <safety_controller soft_upper_limit="3.0543" soft_lower_limit="-3.0543" k_position="15" k_velocity="10"/>
+  </joint>
+  <link name="right_ft_sensor_link">
+    <inertial>
+      <origin xyz="-1.1102E-16 0 2.7756E-17" rpy="0 0 0"/>
+      <mass value="0.40124"/>
+      <inertia ixx="0.00019239" ixy="2.7997E-09" ixz="7.293E-21" iyy="0.00019206" iyz="2.6022E-21" izz="0.00032476"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/ft_sensor_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.89804 0.91765 0.92941 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/ft_sensor_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_ft_sensor_joint" type="fixed">
+    <origin xyz="0 0 0.12493" rpy="0 0 0"/>
+    <parent link="right_wrist3_link"/>
+    <child link="right_ft_sensor_link"/>
+  </joint>
+  <link name="right_gripper_base_link">
+    <inertial>
+      <origin xyz="1.2975E-05 2.3049E-06 0.038402" rpy="0 0 0"/>
+      <mass value="0.043317"/>
+      <inertia ixx="1.0086E-05" ixy="-6.2403E-09" ixz="2.9549E-08" iyy="1.2273E-05" iyz="-7.8931E-09" izz="5.9319E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/gripper_base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/gripper_base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_gripper_base_joint" type="fixed">
+    <origin xyz="0 0 0.014066" rpy="0 0 0"/>
+    <parent link="right_ft_sensor_link"/>
+    <child link="right_gripper_base_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <link name="right_finger1">
+    <inertial>
+      <origin xyz="0.00067584 0.03547 -5.8981E-06" rpy="0 0 0"/>
+      <mass value="0.008826"/>
+      <inertia ixx="1.5494E-06" ixy="5.248E-07" ixz="3.4585E-09" iyy="9.8473E-07" iyz="-4.5799E-09" izz="1.9457E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <!-- Exact rigid CAD solid as three convex boxes; keep STL visualization. -->
+    <collision name="right_finger1_base">
+      <origin xyz="0.00894965921142 0.023 -7.81024927104e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.0323 0.006 0.02"/>
+      </geometry>
+    </collision>
+    <collision name="right_finger1_stem">
+      <origin xyz="-0.0046998210384 0.03125 4.10147168424e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.005 0.0105 0.02"/>
+      </geometry>
+    </collision>
+    <collision name="right_finger1_tip">
+      <origin xyz="-0.00609976773069 0.049 5.32318665401e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.0078 0.025 0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_finger1_joint" type="prismatic">
+    <origin xyz="-0.0099996 -8.7267E-05 0.0558" rpy="1.5708 0 3.1416"/>
+    <parent link="right_gripper_base_link"/>
+    <child link="right_finger1"/>
+    <axis xyz="0.99996 0 -0.0087267"/>
+    <limit lower="0" upper="0.0305" effort="150" velocity="0.2"/>
+  </joint>
+  <link name="right_finger2">
+    <inertial>
+      <origin xyz="-0.00067584 0.03547 5.8981E-06" rpy="0 0 0"/>
+      <mass value="0.008826"/>
+      <inertia ixx="1.5494E-06" ixy="-5.248E-07" ixz="3.4585E-09" iyy="9.8473E-07" iyz="4.5799E-09" izz="1.9457E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://s622_dual_descriptions/meshes/robot/finger2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <!-- Exact rigid CAD solid as three convex boxes; keep STL visualization. -->
+    <collision name="right_finger2_base">
+      <origin xyz="-0.00894965921142 0.023 7.81024927104e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.0323 0.006 0.02"/>
+      </geometry>
+    </collision>
+    <collision name="right_finger2_stem">
+      <origin xyz="0.0046998210384 0.03125 -4.10147168424e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.005 0.0105 0.02"/>
+      </geometry>
+    </collision>
+    <collision name="right_finger2_tip">
+      <origin xyz="0.00609976773069 0.049 -5.32318665401e-05" rpy="0 0.0087266462599716 0"/>
+      <geometry>
+        <box size="0.0078 0.025 0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_finger2_joint" type="prismatic">
+    <origin xyz="0.0099996 8.7267E-05 0.0558" rpy="1.5708 0 3.1416"/>
+    <parent link="right_gripper_base_link"/>
+    <child link="right_finger2"/>
+    <axis xyz="0.99996 0 -0.0087267"/>
+    <limit lower="-0.0305" upper="0" effort="150" velocity="0.2"/>
+  </joint>
+  <link name="right_grasp_frame"/>
+  <joint name="right_gripper_base_to_grasp_frame" type="fixed">
+    <origin xyz="0 0 0.1048" rpy="0 0 0"/>
+    <parent link="right_gripper_base_link"/>
+    <child link="right_grasp_frame"/>
+  </joint>
+</robot>

@@ -1,0 +1,47 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+    # YOLO_OBB模型参数
+    model.path: ""
+    model.device: ""
+    model.target_classes: ["copper_terminal", "wire"]
+    model.confidence: 0.60
+    model.iou: 0.50
+    model.image_size: 1280
+    model.max_detections: 20
+
+    # 相机话题订阅
+    input.rgb_topic: "/global_camera/rgb/image_raw"
+    input.depth_topic: "/global_camera/depth/image_raw"
+    input.camera_info_topic: "/global_camera/camera_info"
+
+    synchronization.queue_size: 10
+    synchronization.slop: 0.05
+
+    # 深度值计算参数
+    depth.minimum_m: 0.15
+    depth.maximum_m: 4.0
+    depth.roi_scale: 0.72
+    depth.minimum_valid_ratio: 0.20
+    depth.surface_percentile: 35.0
+    depth.surface_band_m: 0.015
+    depth.endpoint_radius_px: 3
+
+    tf.target_frame: "world"
+    tf.lookup_timeout: 0.10
+    localization.enforce_horizontal_axis: true
+
+    # 输出话题
+    output.detections_2d_topic: "/yolo_obb/detections_2d"
+    output.detections_3d_camera_topic: "/yolo_obb/detections_3d_camera"
+    output.detections_3d_world_topic: "/yolo_obb/detections_3d"
+    output.debug_image_topic: "/yolo_obb/debug_image"
+    output.markers_topic: "/yolo_obb/markers"
+    output.publish_debug_image: true
+
+    inference.verbose: false
+    inference.enabled: true
+    control.enable_service: "/s622_dual_perception/obb/set_enabled"
+    logging.summary_interval: 30
+
+

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="s622_right_force_test_scene">
+  <!-- Isolated scene: robot, floor and table only. -->
+  <include file="s622_dual_force_test.xml"/>
+
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"
+          cone="elliptic" solver="Newton" tolerance="1e-10"
+          impratio="10" noslip_iterations="3"/>
+  <statistic center="0 0 0.85" extent="1.8"/>
+
+  <visual>
+    <global azimuth="120" elevation="-25" offwidth="1280" offheight="960"/>
+    <scale forcewidth="0.01" contactwidth="0.005" contactheight="0.1"
+           framelength="0.5" framewidth="0.01" selectpoint="0.02"
+           constraint="0.01"/>
+  </visual>
+
+  <asset>
+    <texture name="force_test_floor_checker" type="2d" builtin="checker"
+             rgb1="0.18 0.22 0.26" rgb2="0.28 0.32 0.36"
+             width="512" height="512"/>
+    <material name="force_test_floor_material"
+              texture="force_test_floor_checker" texrepeat="4 4"/>
+    <material name="force_test_table_material" rgba="0.5 0.5 0.5 1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 3" dir="0 0 -1"
+           diffuse="0.3 0.3 0.3" specular="0.3 0.3 0.3"/>
+    <geom name="floor" type="plane" size="2 2 0.1" pos="0 0 0"
+          material="force_test_floor_material"
+          friction="0.8 0.005 0.0001"/>
+
+    <!-- 1.6 x 1.0 x 0.06 m table; top surface is world z=0.750 m. -->
+    <body name="work_table">
+      <geom name="table_top" type="box" pos="0 0 0.720"
+            size="0.8 0.5 0.03" material="force_test_table_material"
+            friction="0.2 0.005 0.0001"/>
+      <geom name="table_leg_fl" type="box" pos="-0.70 -0.40 0.345"
+            size="0.03 0.03 0.345" rgba="0.25 0.27 0.30 1"/>
+      <geom name="table_leg_fr" type="box" pos="0.70 -0.40 0.345"
+            size="0.03 0.03 0.345" rgba="0.25 0.27 0.30 1"/>
+      <geom name="table_leg_rl" type="box" pos="-0.70 0.40 0.345"
+            size="0.03 0.03 0.345" rgba="0.25 0.27 0.30 1"/>
+      <geom name="table_leg_rr" type="box" pos="0.70 0.40 0.345"
+            size="0.03 0.03 0.345" rgba="0.25 0.27 0.30 1"/>
+    </body>
+  </worldbody>
+
+  <keyframe>
+    <key name="home"
+         qpos="
+           1.04719755 -1.57079633 1.57079633
+           -1.57079633 -1.57079633 0 0 0
+           -1.8288381274539987 -1.3883839068782462 1.5717401510852207
+           -1.7438615839175868 -1.57079633 -0.26660799146339653 0 0
+         "
+         ctrl="
+           1.04719755 -1.57079633 1.57079633
+           -1.57079633 -1.57079633 0 0 0
+           -1.3275199 -1.98157239 1.85895165
+           -1.4445118 -1.57079633 0 0 0
+         "/>
+  </keyframe>
+</mujoco>
+
+
+  <!-- right_finger1_joint: 0
+  right_finger2_joint: 0
+  right_j1: -1.8680760108761
+  right_j2: -1.6446885330787901
+  right_j3: 1.652222565496337
+  right_j4: -1.5751903193659518
+  right_j5: -1.57079633
+  right_j6: 0 -->

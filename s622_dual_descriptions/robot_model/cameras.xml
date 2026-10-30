@@ -1,0 +1,11 @@
+<mujoco model="scene_cameras">
+  <worldbody>
+    <!-- 固定在世界坐标系中的俯视相机 -->
+    <camera name="global_camera"
+            mode="fixed"
+            pos="0 0.25 1.8"
+            quat="1 0 0 0"
+            fovy="58"
+            resolution="1280 960"/>
+  </worldbody>
+</mujoco>

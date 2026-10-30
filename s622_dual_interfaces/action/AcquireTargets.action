@@ -1,0 +1,13 @@
+string expected_frame
+float64 confirm_duration_sec
+float64 maximum_gap_sec
+float64 maximum_message_age_sec
+int32 minimum_confirmations
+float64 timeout_sec
+---
+bool success
+string reason
+vision_msgs/Detection3D wire
+vision_msgs/Detection3D terminal
+---
+string status

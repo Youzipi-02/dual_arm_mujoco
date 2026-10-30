@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="s622_dual_descriptions">
+    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+    <xacro:arg name="mujoco_model" default="$(find s622_dual_descriptions)/robot_model/scene.xml" />
+    <xacro:arg name="mujoco_headless" default="false" />
+
+    <!-- Import s622_dual_descriptions urdf file -->
+    <xacro:include filename="$(find s622_dual_descriptions)/robot_model/s622_dual.urdf" />
+
+    <!-- Import control_xacro -->
+    <xacro:include filename="s622_dual_descriptions.ros2_control.xacro" />
+
+    <!-- Import camera xacro -->
+    <xacro:include filename="$(find s622_dual_descriptions)/robot_model/s622_dual_cameras.xacro"/>
+
+
+    <xacro:s622_dual_descriptions_ros2_control
+        name="MujocoSystem"
+        initial_positions_file="$(arg initial_positions_file)"
+        mujoco_model="$(arg mujoco_model)"
+        mujoco_headless="$(arg mujoco_headless)"/>
+
+</robot>

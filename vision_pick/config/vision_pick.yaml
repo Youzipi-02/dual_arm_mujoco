@@ -1,0 +1,53 @@
+/**:
+  ros__parameters:
+    frames.wire_object: wire_object_frame
+    frames.terminal_object: terminal_object_frame
+    perception.acquire_targets_action: /target_acquisition/acquire_targets
+    vision.confirm_duration: 2.0
+    vision.maximum_detection_gap: 0.75
+    vision.maximum_message_age: 1.0
+    vision.minimum_confirmations: 3
+    vision.wait_timeout: 15.0
+    vision.pregrasp_height: 0.12
+    vision.minimum_grasp_height: 0.7625
+    vision.wire_grasp_axial_offset: 0.0
+    vision.terminal_grasp_axial_offset: 0.0
+    vision.wire_grasp_height_offset: 0.0
+    vision.terminal_grasp_height_offset: 0.0
+    perception.obb_enable_service: /s622_dual_perception/obb/set_enabled
+    perception.service_timeout: 5.0
+    vision.tabletop_grasp_orientation:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.70710678
+    - 0.70710678
+    - 0.0
+    - 0.0
+    safety.grasp_eef_position_tolerance: 0.01
+    safety.grasp_eef_angular_tolerance: 0.08726646259971647
+    motion.planning_time: 8.0
+    motion.planning_attempts: 10
+    scene.workpiece_collisions_enabled: false
+    fixture.model_pose:
+    - 0.0
+    - 0.25
+    - 0.854
+    - 0.0
+    - 0.70710678
+    - 0.70710678
+    - 0.0
+    fixture.mesh_resource: package://s622_dual_descriptions/meshes/objects/middleware.stl
+    use_sim_time: true
+    pick.execute: false
+    pick.motion_timeout: 90.0
+    pick.scene_timeout: 20.0
+    pick.cancel_timeout: 5.0
+    pick.interface_timeout: 60.0
+    motion.velocity_scale: 0.3
+    motion.acceleration_scale: 0.3
+    motion.approach_velocity_scale: 0.05
+    motion.cartesian_max_step: 0.0025
+    motion.cartesian_fraction_threshold: 0.999
+    motion.position_tolerance: 0.001
+    motion.angular_tolerance: 0.05

@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mujoco：MJCF 模型根节点，model 指定模型名称。 -->
+<mujoco model="s622_dual">
+  <!-- compiler：设置编译选项；使用弧度、指定网格目录，并保留静态刚体和显式惯性参数。 -->
+  <compiler angle="radian" meshdir="../meshes/robot" fusestatic="false" inertiafromgeom="false" />
+
+  <!-- default：声明可复用的默认属性；嵌套 default 用 class 命名，供模型元素显式引用。 -->
+  <default>
+    <default class="s622_position">
+      <!-- position：位置伺服默认参数；kp/kv 为位置/速度反馈增益，启用控制量和输出力限幅。 -->
+      <position kp="200" kv="20" gear="1" ctrllimited="true" forcelimited="true" />
+    </default>
+
+    <!--
+      手指以米为单位；1 mm 伺服误差在 kp=1500 N/m 下约产生 1.5 N/指。
+      独立于机械臂增益，执行器仍受下方 150 N 力限幅约束。
+    -->
+    <default class="s622_gripper_position">
+      <position kp="1500" kv="20" gear="1" ctrllimited="true" forcelimited="true" />
+    </default>
+
+    <!--
+      指尖接触参数：friction 设置摩擦系数，solref="0.01 1" 设置 10 ms 时间常数和阻尼比 1。
+      接触刚度影响闭爪预压对应的伺服位置误差、法向力和几何穿透量。
+    -->
+    <default class="s622_fingertip_contact">
+      <geom friction="1.0 0.02 0.001" solref="0.008 1" />
+    </default>
+  </default>
+
+  <!-- asset：声明可复用资源；mesh 加载 STL 网格，文件路径相对于 compiler.meshdir。 -->
+  <asset>
+    <mesh name="base_link" content_type="model/stl" file="base_link.STL" />
+    <mesh name="shoulder_link" content_type="model/stl" file="shoulder_link.STL" />
+    <mesh name="upperarm_link" content_type="model/stl" file="upperarm_link.STL" />
+    <mesh name="forearm_link" content_type="model/stl" file="forearm_link.STL" />
+    <mesh name="wrist1_link" content_type="model/stl" file="wrist1_link.STL" />
+    <mesh name="wrist2_link" content_type="model/stl" file="wrist2_link.STL" />
+    <mesh name="wrist3_link" content_type="model/stl" file="wrist3_link.STL" />
+    <mesh name="ft_sensor_link" content_type="model/stl" file="ft_sensor_link.STL" />
+    <mesh name="gripper_base_link" content_type="model/stl" file="gripper_base_link.STL" />
+    <mesh name="finger1_link" content_type="model/stl" file="finger1_link.STL" />
+    <mesh name="finger2_link" content_type="model/stl" file="finger2_link.STL" />
+  </asset>
+
+  <!--
+    worldbody：世界坐标系下的刚体树，嵌套 body 表示父子装配关系。
+    双臂固定装配；沿用原模型的 0.753 m 安装高度和全部 link/joint 名称。
+    各有质量 body 的 gravcomp=1 启用重力补偿；关节 actuatorgravcomp=true
+    将补偿计入总执行器力，由原 actuatorfrcrange 限制 PD 与补偿的合力。
+  -->
+  <worldbody>
+    <!-- light：场景光源；targetbodycom 使光源朝向指定刚体的质心。 -->
+    <light name="spotlight1" mode="targetbodycom" target="left_wrist3_link" pos="0 -1 2" />
+    <light name="spotlight2" mode="targetbodycom" target="right_wrist3_link" pos="0 -1 2" />
+
+    <!-- body：定义局部坐标系及其子刚体；pos/quat 相对于父坐标系，无 joint 的刚体与父刚体固定连接。 -->
+    <body name="dual_base" pos="0 0 0.753">
+      <!-- 左臂：机械臂基座。 -->
+      <body name="left_base_link" pos="-0.4 0 0" quat="0 0 0 1" gravcomp="1">
+        <!-- inertial：定义质量、质心位姿和主惯性矩；quat 的分量顺序为 w x y z。 -->
+        <inertial
+          pos="-0.00049027 -0.00045095 0.032527"
+          quat="0.2655 0.648354 -0.281455 0.65569"
+          mass="0.29035"
+          diaginertia="0.000732373 0.000517121 0.000508766"
+        />
+
+        <!-- geom：定义几何形状；此视觉网格用 contype=0、conaffinity=0 关闭碰撞，group=1 用于显示分组。 -->
+        <geom
+          pos="0 0 0"
+          quat="1 0 0 0"
+          type="mesh"
+          contype="0"
+          conaffinity="0"
+          group="1"
+          rgba="1 1 1 1"
+          density="0"
+          mesh="base_link"
+          name="left_base_link_visual_0"
+        />
+
+        <!-- 碰撞 geom：参与接触计算；group=3 用于显示分组，本身不决定碰撞是否启用。 -->
+        <geom
+          pos="0 0 0"
+          quat="1 0 0 0"
+          type="mesh"
+          rgba="1 1 1 1"
+          mesh="base_link"
+          group="3"
+          name="left_base_link_collision_1"
+        />
+
+        <!-- 左臂：肩部。 -->
+        <body name="left_shoulder_link" gravcomp="1">
+          <inertial
+            pos="-2.8223e-07 -0.0024164 0.13521"
+            quat="0.999724 0.0234861 1.26894e-05 -0.000312562"
+            mass="0.78648"
+            diaginertia="0.0012306 0.00120146 0.000855888"
+          />
+
+          <!-- joint：定义相对父刚体的关节；此处默认 hinge（转动），range 为角度限位（rad）。 -->
+          <joint name="left_j1" range="-3.0543 3.0543" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+          <geom
+            quat="1 0 0 0"
+            type="mesh"
+            contype="0"
+            conaffinity="0"
+            group="1"
+            rgba="1 1 1 1"
+            density="0"
+            mesh="shoulder_link"
+            name="left_shoulder_link_visual_0"
+          />
+          <geom
+            quat="1 0 0 0"
+            type="mesh"
+            rgba="1 1 1 1"
+            mesh="shoulder_link"
+            group="3"
+            name="left_shoulder_link_collision_1"
+          />
+
+          <!-- 左臂：上臂。 -->
+          <body name="left_upperarm_link" pos="0 0 0.14" quat="0.707105 0.707108 0 0" gravcomp="1">
+            <inertial
+              pos="-0.14 -3.2998e-09 0.1117"
+              quat="0.5 0.5 0.5 0.5"
+              mass="2.774"
+              diaginertia="0.037026 0.036047 0.0038584"
+            />
+
+            <joint name="left_j2" range="-4.6251 1.4835" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+            <geom
+              pos="0 0 0"
+              quat="1 0 0 0"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="1"
+              rgba="1 1 1 1"
+              density="0"
+              mesh="upperarm_link"
+              name="left_upperarm_link_visual_0"
+            />
+            <geom
+              pos="0 0 0"
+              quat="1 0 0 0"
+              type="mesh"
+              rgba="1 1 1 1"
+              mesh="upperarm_link"
+              group="3"
+              name="left_upperarm_link_collision_1"
+            />
+
+            <!-- 左臂：前臂。 -->
+            <body name="left_forearm_link" pos="-0.28 0 0" gravcomp="1">
+              <inertial
+                pos="-0.12829 3.461e-07 0.004504"
+                quat="0.509152 0.490674 0.490663 0.509169"
+                mass="1.8066"
+                diaginertia="0.016897 0.0165801 0.00184465"
+              />
+
+              <joint name="left_j3" range="-2.8274 2.8274" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+              <geom
+                pos="0 0 0"
+                quat="1 0 0 0"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="1"
+                rgba="1 1 1 1"
+                density="0"
+                mesh="forearm_link"
+                name="left_forearm_link_visual_0"
+              />
+              <geom
+                pos="0 0 0"
+                quat="1 0 0 0"
+                type="mesh"
+                rgba="1 1 1 1"
+                mesh="forearm_link"
+                group="3"
+                name="left_forearm_link_collision_1"
+              />
+
+              <!-- 左臂：腕部第一节。 -->
+              <body name="left_wrist1_link" pos="-0.24001 0 0" gravcomp="1">
+                <inertial
+                  pos="2.7977e-07 -0.00344 0.098294"
+                  quat="0.731736 0.681588 -0.000124024 0.000131003"
+                  mass="0.59151"
+                  diaginertia="0.0007449 0.000707365 0.000537075"
+                />
+
+                <joint name="left_j4" range="-4.6251 1.4835" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                <geom
+                  pos="0 0 0"
+                  quat="1 0 0 0"
+                  type="mesh"
+                  contype="0"
+                  conaffinity="0"
+                  group="1"
+                  rgba="1 1 1 1"
+                  density="0"
+                  mesh="wrist1_link"
+                  name="left_wrist1_link_visual_0"
+                />
+                <geom
+                  pos="0 0 0"
+                  quat="1 0 0 0"
+                  type="mesh"
+                  rgba="1 1 1 1"
+                  mesh="wrist1_link"
+                  group="3"
+                  name="left_wrist1_link_collision_1"
+                />
+
+                <!-- 左臂：腕部第二节。 -->
+                <body name="left_wrist2_link" pos="0 0 0.102" quat="0.707105 0.707108 0 0" gravcomp="1">
+                  <inertial
+                    pos="-2.7639e-07 0.00344 0.098294"
+                    quat="0.681588 0.731736 0.000130915 -0.000123942"
+                    mass="0.59151"
+                    diaginertia="0.0007449 0.000707365 0.000537075"
+                  />
+
+                  <joint name="left_j5" range="-3.0543 3.0543" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                  <geom
+                    quat="1 0 0 0"
+                    type="mesh"
+                    contype="0"
+                    conaffinity="0"
+                    group="1"
+                    rgba="1 1 1 1"
+                    density="0"
+                    mesh="wrist2_link"
+                    name="left_wrist2_link_visual_0"
+                  />
+                  <geom
+                    quat="1 0 0 0"
+                    type="mesh"
+                    rgba="1 1 1 1"
+                    mesh="wrist2_link"
+                    group="3"
+                    name="left_wrist2_link_collision_1"
+                  />
+
+                  <!-- 左臂：腕部第三节。 -->
+                  <body name="left_wrist3_link" pos="0 0 0.102" quat="0.707105 -0.707108 0 0" gravcomp="1">
+                    <inertial
+                      pos="3.9215e-05 7.1906e-06 0.089452"
+                      quat="0.00418815 0.706955 -0.00382602 0.707236"
+                      mass="0.38464"
+                      diaginertia="0.00032446 0.00019407 0.00019393"
+                    />
+
+                    <joint name="left_j6" range="-3.0543 3.0543" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                    <geom
+                      pos="0 0 0"
+                      quat="1 0 0 0"
+                      type="mesh"
+                      contype="0"
+                      conaffinity="0"
+                      group="1"
+                      rgba="0.66667 0.69804 0.76863 1"
+                      density="0"
+                      mesh="wrist3_link"
+                      name="left_wrist3_link_visual_0"
+                    />
+                    <geom
+                      pos="0 0 0"
+                      quat="1 0 0 0"
+                      type="mesh"
+                      rgba="0.66667 0.69804 0.76863 1"
+                      mesh="wrist3_link"
+                      group="3"
+                      name="left_wrist3_link_collision_1"
+                    />
+
+                    <!-- 左臂：力/力矩传感器安装体。 -->
+                    <body name="left_ft_sensor_link" pos="0 0 0.12493" gravcomp="1">
+                      <!-- site：定义传感器参考位置和坐标系；自身没有质量，也不参与碰撞。 -->
+                      <site name="left_ft_site" pos="0 0 0" quat="1 0 0 0" size="0.005" rgba="1 0 0 1" />
+                      <inertial
+                        pos="0 0 0"
+                        quat="0.497875 0.502116 -0.497875 0.502116"
+                        mass="0.40124"
+                        diaginertia="0.00032476 0.00019239 0.00019206"
+                      />
+
+                      <geom
+                        quat="1 0 0 0"
+                        type="mesh"
+                        contype="0"
+                        conaffinity="0"
+                        group="1"
+                        rgba="0.89804 0.91765 0.92941 1"
+                        density="0"
+                        mesh="ft_sensor_link"
+                        name="left_ft_sensor_link_visual_0"
+                      />
+                      <geom
+                        quat="1 0 0 0"
+                        type="mesh"
+                        rgba="0.89804 0.91765 0.92941 1"
+                        mesh="ft_sensor_link"
+                        group="3"
+                        name="left_ft_sensor_link_collision_1"
+                      />
+
+                      <!-- 左臂：夹爪基座。 -->
+                      <body name="left_gripper_base_link" pos="0 0 0.014066" gravcomp="1">
+                        <inertial
+                          pos="1.2975e-05 2.3049e-06 0.038402"
+                          quat="0.706085 -0.00295463 -0.00207223 0.708118"
+                          mass="0.043317"
+                          diaginertia="1.2273e-05 1.00862e-05 5.93168e-06"
+                        />
+
+                        <geom
+                          quat="1 0 0 0"
+                          type="mesh"
+                          contype="0"
+                          conaffinity="0"
+                          group="1"
+                          rgba="0.79216 0.81961 0.93333 1"
+                          density="0"
+                          mesh="gripper_base_link"
+                          name="left_gripper_base_link_visual_0"
+                        />
+                        <geom
+                          quat="1 0 0 0"
+                          type="mesh"
+                          rgba="0.79216 0.81961 0.93333 1"
+                          mesh="gripper_base_link"
+                          group="3"
+                          name="left_gripper_base_link_collision_1"
+                        />
+
+                        <!-- 左臂：第一手指。 -->
+                        <body
+                          name="left_finger1"
+                          pos="-0.0099996 -8.7267e-05 0.0558"
+                          quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105"
+                          gravcomp="1"
+                        >
+                          <inertial
+                            pos="0.00067584 0.03547 -5.8981e-06"
+                            quat="0.350459 0.61769 -0.347416 0.612324"
+                            mass="0.008826"
+                            diaginertia="1.94573e-06 1.86299e-06 6.71113e-07"
+                          />
+
+                          <!-- slide：沿 axis 指定的局部轴平移；range 为行程限位（m），actuatorfrcrange 限制关节总执行器力。 -->
+                          <joint
+                            name="left_finger1_joint"
+                            type="slide"
+                            range="0 0.0305"
+                            actuatorfrcrange="-150 150"
+                            axis="0.999962 0 -0.00872672"
+                            actuatorgravcomp="true"
+                          />
+
+                          <geom
+                            pos="0 0 0"
+                            quat="1 0 0 0"
+                            type="mesh"
+                            contype="0"
+                            conaffinity="0"
+                            group="1"
+                            rgba="1 1 1 1"
+                            density="0"
+                            mesh="finger1_link"
+                            name="left_finger1_visual_0"
+                          />
+
+                          <!-- box 几何体：用基部、指杆和指尖近似手指碰撞外形；size 是各轴半尺寸（m）。 -->
+                          <geom
+                            name="left_finger1_base"
+                            size="0.01615 0.003 0.01"
+                            pos="0.00894966 0.023 -7.81025e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            name="left_finger1_stem"
+                            size="0.0025 0.00525 0.01"
+                            pos="-0.00469982 0.03125 4.10147e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            class="s622_fingertip_contact"
+                            name="left_finger1_tip"
+                            size="0.0039 0.0125 0.01"
+                            pos="-0.00609977 0.049 5.32319e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                        </body>
+
+                        <!-- 左臂：第二手指。 -->
+                        <body
+                          name="left_finger2"
+                          pos="0.0099996 8.7267e-05 0.0558"
+                          quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105"
+                          gravcomp="1"
+                        >
+                          <inertial
+                            pos="-0.00067584 0.03547 5.8981e-06"
+                            quat="0.61769 0.350459 -0.612324 0.347416"
+                            mass="0.008826"
+                            diaginertia="1.94573e-06 1.86299e-06 6.71113e-07"
+                          />
+
+                          <joint
+                            name="left_finger2_joint"
+                            type="slide"
+                            range="-0.0305 0"
+                            actuatorfrcrange="-150 150"
+                            axis="0.999962 0 -0.00872672"
+                            actuatorgravcomp="true"
+                          />
+
+                          <geom
+                            pos="0 0 0"
+                            quat="1 0 0 0"
+                            type="mesh"
+                            contype="0"
+                            conaffinity="0"
+                            group="1"
+                            rgba="1 1 1 1"
+                            density="0"
+                            mesh="finger2_link"
+                            name="left_finger2_visual_0"
+                          />
+                          <geom
+                            name="left_finger2_base"
+                            size="0.01615 0.003 0.01"
+                            pos="-0.00894966 0.023 7.81025e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            name="left_finger2_stem"
+                            size="0.0025 0.00525 0.01"
+                            pos="0.00469982 0.03125 -4.10147e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            class="s622_fingertip_contact"
+                            name="left_finger2_tip"
+                            size="0.0039 0.0125 0.01"
+                            pos="0.00609977 0.049 -5.32319e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                        </body>
+
+                        <!-- 左臂：抓取参考坐标系（固定在夹爪上）。 -->
+                        <body name="left_grasp_frame" pos="0 0 0.1048">
+                          <!-- TCP 标记：提供工具中心点的位置和朝向，供末端定位使用。 -->
+                          <site name="left_tcp" size="0.008" rgba="1 0.2 0.2 1" group="1" />
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- 右臂：机械臂基座。 -->
+      <body name="right_base_link" pos="0.4 0 0" gravcomp="1">
+        <inertial
+          pos="-0.00049027 -0.00045095 0.032527"
+          quat="0.2655 0.648354 -0.281455 0.65569"
+          mass="0.29035"
+          diaginertia="0.000732373 0.000517121 0.000508766"
+        />
+
+        <geom
+          pos="0 0 0"
+          quat="1 0 0 0"
+          type="mesh"
+          contype="0"
+          conaffinity="0"
+          group="1"
+          rgba="1 1 1 1"
+          density="0"
+          mesh="base_link"
+          name="right_base_link_visual_0"
+        />
+        <geom
+          pos="0 0 0"
+          quat="1 0 0 0"
+          type="mesh"
+          rgba="1 1 1 1"
+          mesh="base_link"
+          group="3"
+          name="right_base_link_collision_1"
+        />
+
+        <!-- 右臂：肩部。 -->
+        <body name="right_shoulder_link" gravcomp="1">
+          <inertial
+            pos="-2.8223e-07 -0.0024164 0.13521"
+            quat="0.999724 0.0234861 1.26894e-05 -0.000312562"
+            mass="0.78648"
+            diaginertia="0.0012306 0.00120146 0.000855888"
+          />
+
+          <joint name="right_j1" range="-3.0543 3.0543" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+          <geom
+            quat="1 0 0 0"
+            type="mesh"
+            contype="0"
+            conaffinity="0"
+            group="1"
+            rgba="1 1 1 1"
+            density="0"
+            mesh="shoulder_link"
+            name="right_shoulder_link_visual_0"
+          />
+          <geom
+            quat="1 0 0 0"
+            type="mesh"
+            rgba="1 1 1 1"
+            mesh="shoulder_link"
+            group="3"
+            name="right_shoulder_link_collision_1"
+          />
+
+          <!-- 右臂：上臂。 -->
+          <body name="right_upperarm_link" pos="0 0 0.14" quat="0.707105 0.707108 0 0" gravcomp="1">
+            <inertial
+              pos="-0.14 -3.2998e-09 0.1117"
+              quat="0.5 0.5 0.5 0.5"
+              mass="2.774"
+              diaginertia="0.037026 0.036047 0.0038584"
+            />
+
+            <joint name="right_j2" range="-4.6251 1.4835" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+            <geom
+              pos="0 0 0"
+              quat="1 0 0 0"
+              type="mesh"
+              contype="0"
+              conaffinity="0"
+              group="1"
+              rgba="1 1 1 1"
+              density="0"
+              mesh="upperarm_link"
+              name="right_upperarm_link_visual_0"
+            />
+            <geom
+              pos="0 0 0"
+              quat="1 0 0 0"
+              type="mesh"
+              rgba="1 1 1 1"
+              mesh="upperarm_link"
+              group="3"
+              name="right_upperarm_link_collision_1"
+            />
+
+            <!-- 右臂：前臂。 -->
+            <body name="right_forearm_link" pos="-0.28 0 0" gravcomp="1">
+              <inertial
+                pos="-0.12829 3.461e-07 0.004504"
+                quat="0.509152 0.490674 0.490663 0.509169"
+                mass="1.8066"
+                diaginertia="0.016897 0.0165801 0.00184465"
+              />
+
+              <joint name="right_j3" range="-2.8274 2.8274" actuatorfrcrange="-150 150" actuatorgravcomp="true" />
+
+              <geom
+                pos="0 0 0"
+                quat="1 0 0 0"
+                type="mesh"
+                contype="0"
+                conaffinity="0"
+                group="1"
+                rgba="1 1 1 1"
+                density="0"
+                mesh="forearm_link"
+                name="right_forearm_link_visual_0"
+              />
+              <geom
+                pos="0 0 0"
+                quat="1 0 0 0"
+                type="mesh"
+                rgba="1 1 1 1"
+                mesh="forearm_link"
+                group="3"
+                name="right_forearm_link_collision_1"
+              />
+
+              <!-- 右臂：腕部第一节。 -->
+              <body name="right_wrist1_link" pos="-0.24001 0 0" gravcomp="1">
+                <inertial
+                  pos="2.7977e-07 -0.00344 0.098294"
+                  quat="0.731736 0.681588 -0.000124024 0.000131003"
+                  mass="0.59151"
+                  diaginertia="0.0007449 0.000707365 0.000537075"
+                />
+
+                <joint name="right_j4" range="-4.6251 1.4835" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                <geom
+                  pos="0 0 0"
+                  quat="1 0 0 0"
+                  type="mesh"
+                  contype="0"
+                  conaffinity="0"
+                  group="1"
+                  rgba="1 1 1 1"
+                  density="0"
+                  mesh="wrist1_link"
+                  name="right_wrist1_link_visual_0"
+                />
+                <geom
+                  pos="0 0 0"
+                  quat="1 0 0 0"
+                  type="mesh"
+                  rgba="1 1 1 1"
+                  mesh="wrist1_link"
+                  group="3"
+                  name="right_wrist1_link_collision_1"
+                />
+
+                <!-- 右臂：腕部第二节。 -->
+                <body name="right_wrist2_link" pos="0 0 0.102" quat="0.707105 0.707108 0 0" gravcomp="1">
+                  <inertial
+                    pos="-2.7639e-07 0.00344 0.098294"
+                    quat="0.681588 0.731736 0.000130915 -0.000123942"
+                    mass="0.59151"
+                    diaginertia="0.0007449 0.000707365 0.000537075"
+                  />
+
+                  <joint name="right_j5" range="-3.0543 3.0543" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                  <geom
+                    quat="1 0 0 0"
+                    type="mesh"
+                    contype="0"
+                    conaffinity="0"
+                    group="1"
+                    rgba="1 1 1 1"
+                    density="0"
+                    mesh="wrist2_link"
+                    name="right_wrist2_link_visual_0"
+                  />
+                  <geom
+                    quat="1 0 0 0"
+                    type="mesh"
+                    rgba="1 1 1 1"
+                    mesh="wrist2_link"
+                    group="3"
+                    name="right_wrist2_link_collision_1"
+                  />
+
+                  <!-- 右臂：腕部第三节。 -->
+                  <body name="right_wrist3_link" pos="0 0 0.102" quat="0.707105 -0.707108 0 0" gravcomp="1">
+                    <inertial
+                      pos="3.9215e-05 7.1906e-06 0.089452"
+                      quat="0.00418815 0.706955 -0.00382602 0.707236"
+                      mass="0.38464"
+                      diaginertia="0.00032446 0.00019407 0.00019393"
+                    />
+
+                    <joint name="right_j6" range="-3.0543 3.0543" actuatorfrcrange="-28 28" actuatorgravcomp="true" />
+
+                    <geom
+                      pos="0 0 0"
+                      quat="1 0 0 0"
+                      type="mesh"
+                      contype="0"
+                      conaffinity="0"
+                      group="1"
+                      rgba="0.66667 0.69804 0.76863 1"
+                      density="0"
+                      mesh="wrist3_link"
+                      name="right_wrist3_link_visual_0"
+                    />
+                    <geom
+                      pos="0 0 0"
+                      quat="1 0 0 0"
+                      type="mesh"
+                      rgba="0.66667 0.69804 0.76863 1"
+                      mesh="wrist3_link"
+                      group="3"
+                      name="right_wrist3_link_collision_1"
+                    />
+
+                    <!-- 右臂：力/力矩传感器安装体。 -->
+                    <body name="right_ft_sensor_link" pos="0 0 0.12493" gravcomp="1">
+                      <site name="right_ft_site" pos="0 0 0" quat="1 0 0 0" size="0.005" rgba="0 0 1 1" />
+                      <inertial
+                        pos="0 0 0"
+                        quat="0.497875 0.502116 -0.497875 0.502116"
+                        mass="0.40124"
+                        diaginertia="0.00032476 0.00019239 0.00019206"
+                      />
+
+                      <geom
+                        quat="1 0 0 0"
+                        type="mesh"
+                        contype="0"
+                        conaffinity="0"
+                        group="1"
+                        rgba="0.89804 0.91765 0.92941 1"
+                        density="0"
+                        mesh="ft_sensor_link"
+                        name="right_ft_sensor_link_visual_0"
+                      />
+                      <geom
+                        quat="1 0 0 0"
+                        type="mesh"
+                        rgba="0.89804 0.91765 0.92941 1"
+                        mesh="ft_sensor_link"
+                        group="3"
+                        name="right_ft_sensor_link_collision_1"
+                      />
+
+                      <!-- 右臂：夹爪基座。 -->
+                      <body name="right_gripper_base_link" pos="0 0 0.014066" gravcomp="1">
+                        <inertial
+                          pos="1.2975e-05 2.3049e-06 0.038402"
+                          quat="0.706085 -0.00295463 -0.00207223 0.708118"
+                          mass="0.043317"
+                          diaginertia="1.2273e-05 1.00862e-05 5.93168e-06"
+                        />
+
+                        <geom
+                          quat="1 0 0 0"
+                          type="mesh"
+                          contype="0"
+                          conaffinity="0"
+                          group="1"
+                          rgba="0.79216 0.81961 0.93333 1"
+                          density="0"
+                          mesh="gripper_base_link"
+                          name="right_gripper_base_link_visual_0"
+                        />
+                        <geom
+                          quat="1 0 0 0"
+                          type="mesh"
+                          rgba="0.79216 0.81961 0.93333 1"
+                          mesh="gripper_base_link"
+                          group="3"
+                          name="right_gripper_base_link_collision_1"
+                        />
+
+                        <!-- 右臂：第一手指。 -->
+                        <body
+                          name="right_finger1"
+                          pos="-0.0099996 -8.7267e-05 0.0558"
+                          quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105"
+                          gravcomp="1"
+                        >
+                          <inertial
+                            pos="0.00067584 0.03547 -5.8981e-06"
+                            quat="0.350459 0.61769 -0.347416 0.612324"
+                            mass="0.008826"
+                            diaginertia="1.94573e-06 1.86299e-06 6.71113e-07"
+                          />
+
+                          <joint
+                            name="right_finger1_joint"
+                            type="slide"
+                            range="0 0.0305"
+                            actuatorfrcrange="-150 150"
+                            axis="0.999962 0 -0.00872672"
+                            actuatorgravcomp="true"
+                          />
+
+                          <geom
+                            pos="0 0 0"
+                            quat="1 0 0 0"
+                            type="mesh"
+                            contype="0"
+                            conaffinity="0"
+                            group="1"
+                            rgba="1 1 1 1"
+                            density="0"
+                            mesh="finger1_link"
+                            name="right_finger1_visual_0"
+                          />
+                          <geom
+                            name="right_finger1_base"
+                            size="0.01615 0.003 0.01"
+                            pos="0.00894966 0.023 -7.81025e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            name="right_finger1_stem"
+                            size="0.0025 0.00525 0.01"
+                            pos="-0.00469982 0.03125 4.10147e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            class="s622_fingertip_contact"
+                            name="right_finger1_tip"
+                            size="0.0039 0.0125 0.01"
+                            pos="-0.00609977 0.049 5.32319e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                        </body>
+
+                        <!-- 右臂：第二手指。 -->
+                        <body
+                          name="right_finger2"
+                          pos="0.0099996 8.7267e-05 0.0558"
+                          quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105"
+                          gravcomp="1"
+                        >
+                          <inertial
+                            pos="-0.00067584 0.03547 5.8981e-06"
+                            quat="0.61769 0.350459 -0.612324 0.347416"
+                            mass="0.008826"
+                            diaginertia="1.94573e-06 1.86299e-06 6.71113e-07"
+                          />
+
+                          <joint
+                            name="right_finger2_joint"
+                            type="slide"
+                            range="-0.0305 0"
+                            actuatorfrcrange="-150 150"
+                            axis="0.999962 0 -0.00872672"
+                            actuatorgravcomp="true"
+                          />
+
+                          <geom
+                            pos="0 0 0"
+                            quat="1 0 0 0"
+                            type="mesh"
+                            contype="0"
+                            conaffinity="0"
+                            group="1"
+                            rgba="1 1 1 1"
+                            density="0"
+                            mesh="finger2_link"
+                            name="right_finger2_visual_0"
+                          />
+                          <geom
+                            name="right_finger2_base"
+                            size="0.01615 0.003 0.01"
+                            pos="-0.00894966 0.023 7.81025e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            name="right_finger2_stem"
+                            size="0.0025 0.00525 0.01"
+                            pos="0.00469982 0.03125 -4.10147e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                          <geom
+                            class="s622_fingertip_contact"
+                            name="right_finger2_tip"
+                            size="0.0039 0.0125 0.01"
+                            pos="0.00609977 0.049 -5.32319e-05"
+                            quat="0.99999 0 0.00436331 0"
+                            type="box"
+                            rgba="1 1 1 1"
+                            group="3"
+                          />
+                        </body>
+
+                        <!-- 右臂：抓取参考坐标系（固定在夹爪上）。 -->
+                        <body name="right_grasp_frame" pos="0 0 0.1048">
+                          <site name="right_tcp" size="0.008" rgba="1 0.2 0.2 1" group="1" />
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!--
+    contact：配置接触规则；exclude 按刚体对排除碰撞。
+    机器人内部两对基座/肩部碰撞近似重叠约 5 mm，只排除这两对装配件。
+  -->
+  <contact>
+    <exclude name="left_mount_overlap" body1="left_base_link" body2="left_shoulder_link" />
+    <exclude name="right_mount_overlap" body1="right_base_link" body2="right_shoulder_link" />
+  </contact>
+
+  <!--
+    actuator：定义 16 个位置执行器；position 将 ctrl 作为目标关节位置（rad 或 m）。
+    class 引用默认增益，ctrlrange 限制目标范围，forcerange 限制执行器输出。
+  -->
+  <actuator>
+    <!-- 左臂执行器：六个转动关节，随后为两个手指平移关节；保持现有控制通道顺序。 -->
+    <position
+      class="s622_position"
+      name="left_j1_servo"
+      joint="left_j1"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="left_j2_servo"
+      joint="left_j2"
+      ctrlrange="-4.6251 1.4835"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="left_j3_servo"
+      joint="left_j3"
+      ctrlrange="-2.8274 2.8274"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="left_j4_servo"
+      joint="left_j4"
+      ctrlrange="-4.6251 1.4835"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_position"
+      name="left_j5_servo"
+      joint="left_j5"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_position"
+      name="left_j6_servo"
+      joint="left_j6"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_gripper_position"
+      name="left_finger1_joint_servo"
+      joint="left_finger1_joint"
+      ctrlrange="0 0.0305"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_gripper_position"
+      name="left_finger2_joint_servo"
+      joint="left_finger2_joint"
+      ctrlrange="-0.0305 0"
+      forcerange="-150 150"
+    />
+
+    <!-- 右臂执行器：六个转动关节，随后为两个手指平移关节；保持现有控制通道顺序。 -->
+    <position
+      class="s622_position"
+      name="right_j1_servo"
+      joint="right_j1"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="right_j2_servo"
+      joint="right_j2"
+      ctrlrange="-4.6251 1.4835"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="right_j3_servo"
+      joint="right_j3"
+      ctrlrange="-2.8274 2.8274"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_position"
+      name="right_j4_servo"
+      joint="right_j4"
+      ctrlrange="-4.6251 1.4835"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_position"
+      name="right_j5_servo"
+      joint="right_j5"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_position"
+      name="right_j6_servo"
+      joint="right_j6"
+      ctrlrange="-3.0543 3.0543"
+      forcerange="-28 28"
+    />
+    <position
+      class="s622_gripper_position"
+      name="right_finger1_joint_servo"
+      joint="right_finger1_joint"
+      ctrlrange="0 0.0305"
+      forcerange="-150 150"
+    />
+    <position
+      class="s622_gripper_position"
+      name="right_finger2_joint_servo"
+      joint="right_finger2_joint"
+      ctrlrange="-0.0305 0"
+      forcerange="-150 150"
+    />
+  </actuator>
+
+  <!-- sensor：声明测量输出；力和力矩传感器通过 site 绑定测量坐标系。 -->
+  <sensor>
+    <!-- force：测量 site 所在刚体与父刚体之间的三轴相互作用力（N），在 site 坐标系中表达。 -->
+    <force name="left_ft_sensor_force" site="left_ft_site" />
+
+    <!-- torque：测量同一连接处的三轴相互作用力矩（N·m），在 site 坐标系中表达。 -->
+    <torque name="left_ft_sensor_torque" site="left_ft_site" />
+
+    <force name="right_ft_sensor_force" site="right_ft_site" />
+    <torque name="right_ft_sensor_torque" site="right_ft_site" />
+  </sensor>
+</mujoco>

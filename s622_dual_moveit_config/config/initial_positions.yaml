@@ -1,0 +1,19 @@
+# Default initial positions for s622_dual_descriptions's ros2_control fake system
+
+initial_positions:
+  left_finger1_joint: 0
+  left_finger2_joint: 0
+  left_j1: 1.04719755
+  left_j2: -1.57079633
+  left_j3: 1.57079633
+  left_j4: -1.57079633
+  left_j5: -1.57079633
+  left_j6: 0
+  right_finger1_joint: 0
+  right_finger2_joint: 0
+  right_j1: -1.3275199
+  right_j2: -1.98157239
+  right_j3: 1.85895165
+  right_j4: -1.4445118
+  right_j5: -1.57079633
+  right_j6: 0

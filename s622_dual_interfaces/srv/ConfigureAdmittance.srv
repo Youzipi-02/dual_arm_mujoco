@@ -1,0 +1,7 @@
+float64[6] nominal_velocity
+float64[6] desired_wrench
+bool require_velocity_command
+bool bypass_admittance
+---
+bool success
+string message

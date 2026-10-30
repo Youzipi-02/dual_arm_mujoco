@@ -1,0 +1,28 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+    task.autostart: false
+    task.execute: false
+    task.enable_planar_search: false
+    task.interface_timeout: 60.0
+    task.motion_timeout: 90.0
+    task.cancel_timeout: 5.0
+    assembly.planar_search_action: /planar_search
+    assembly.start_timeout: 5.0
+    terminal.predock_joints:
+    - -0.8172009370600314
+    - -1.2164420007392982
+    - 1.1163878311228477
+    - -1.4675532310896982
+    - -1.5690022561380819
+    - 2.3152808789976755
+    status.enabled: true
+    status.period: 1.0
+    motion.velocity_scale: 0.3
+    motion.acceleration_scale: 0.3
+    task.pick_timeout: 600.0
+    task.release_timeout: 120.0
+    task.search_timeout: 180.0
+    task.fsm_rate: 20.0
+    pick.action: /vision_pick/pick
+    pick.release_action: /vision_pick/release

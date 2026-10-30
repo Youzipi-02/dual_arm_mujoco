@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>s622_dual_descriptions</name>
+  <version>1.1.0</version>
+  <description>URDF, MuJoCo models, and meshes for the S622 dual-arm robot.</description>
+  <maintainer email="1197226282@qq.com">dsl</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

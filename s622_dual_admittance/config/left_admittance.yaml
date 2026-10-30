@@ -1,0 +1,39 @@
+/left_admittance/admittance_controller:
+  ros__parameters:
+    control_rate_hz: 250.0
+
+    sensor_frame: left_ft_sensor_link
+    grasp_frame: left_grasp_frame
+    reference_frame: world
+    wrench_timeout_sec: 0.1
+    velocity_command_timeout_sec: 0.10
+    
+    # 顺序：x, y, z, rx, ry, rz
+    enabled_axes:
+      [true, true, true, true, true, true]
+
+    mass:
+      [1.0, 1.0, 1.0, 0.08, 0.08, 0.08]
+
+    stiffness:
+      [400.0, 300.0, 400.0, 6.0, 6.0, 6.0]
+
+    # 阻尼比为0.8
+    damping:
+      [32.0, 27.713, 32.0, 1.109, 1.109, 1.109]
+
+    # 力死区：N, N, N, Nm, Nm, Nm
+    deadband:
+      [0.3, 0.3, 0.3, 0.02, 0.02, 0.02]
+
+    # 最大导纳修正速度：m/s 和 rad/s
+    max_velocity:
+      [0.01, 0.01, 0.01, 0.15, 0.15, 0.15]
+
+    # 最大导纳位移：m 和 rad
+    max_displacement:
+      [0.05, 0.05, 0.05, 0.087, 0.087, 0.087]
+
+    # 传感器力方向修正；通过实验确认
+    wrench_sign: 1.0
+

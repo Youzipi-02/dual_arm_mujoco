@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="s622_dual_scene">
+  <!-- 仅通过一次 include 引入完整机器人，包含结构、接触配置、执行器和 home。 -->
+  <include file="s622_dual.xml"/>
+  <include file="objects.xml"/> 
+  <include file="cameras.xml"/>
+
+  <!-- 场景保持真实重力；机器人关节重力补偿在 s622_dual.xml 中配置。
+       manipulation 接触使用 MuJoCo 推荐的 elliptic + Newton 组合，并提高
+       摩擦约束相对法向约束的阻抗，抑制软约束造成的持续慢滑。 -->
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"
+          cone="elliptic" solver="Newton" tolerance="1e-10" impratio="10" noslip_iterations="3"/>
+  <statistic center="0 0 0.85" extent="1.8"/>
+  <visual>
+    <global azimuth="120" elevation="-25" offwidth="1280" offheight="960"/>
+    <scale forcewidth="0.01" contactwidth="0.005" contactheight="0.1" framelength="0.5" framewidth="0.01"
+          selectpoint="0.02" constraint="0.01"/>
+  </visual>
+
+  <asset>
+    <texture name="floor_checker" type="2d" builtin="checker"
+             rgb1="0.18 0.22 0.26" rgb2="0.28 0.32 0.36" width="512" height="512"/>
+    <material name="floor_material" texture="floor_checker" texrepeat="4 4"/>
+    <material name="table_top_material" rgba="0.5 0.5 0.5 1"/>
+    <material name="table_leg_material" rgba="0.25 0.27 0.30 1"/>
+  </asset>
+  <worldbody>
+    <!-- <light name="overhead" pos="0 0 3" dir="0 0 -1" directional="true"/> -->
+    <light pos="0 0 3" dir="0 0 -1" diffuse="0.3 0.3 0.3" specular="0.3 0.3 0.3"/>
+    <geom name="floor" type="plane" size="2 2 0.1" pos="0 0 0"
+          material="floor_material" group="0" friction="0.8 0.005 0.0001"/>
+
+    <!-- 示例桌：长 1.6 m，宽 1.0 m，桌面厚 0.06 m，顶面高 0.750 m。
+         机械臂安装高度为 0.753 m，保留 3 mm 间隙，避免底座与桌面碰撞。
+         这些是假设尺寸，需按实物修改；MuJoCo box 的 size 为半尺寸。
+         无 joint/freejoint 的桌子固定在世界中，桌面和桌腿都参与碰撞。 -->
+    <body name="work_table">
+      <geom name="table_top" type="box" pos="0 0 0.720" size="0.8 0.5 0.03"
+            material="table_top_material" group="0" friction="0.8 0.005 0.0001"/>
+      <geom name="table_leg_fl" type="box" pos="-0.70 -0.40 0.345" size="0.03 0.03 0.345"
+            material="table_leg_material" group="0"/>
+      <geom name="table_leg_fr" type="box" pos="0.70 -0.40 0.345" size="0.03 0.03 0.345"
+            material="table_leg_material" group="0"/>
+      <geom name="table_leg_rl" type="box" pos="-0.70 0.40 0.345" size="0.03 0.03 0.345"
+            material="table_leg_material" group="0"/>
+      <geom name="table_leg_rr" type="box" pos="0.70 0.40 0.345" size="0.03 0.03 0.345"
+            material="table_leg_material" group="0"/>
+    </body>
+  </worldbody>
+
+
+  <keyframe>
+    <key name="home"
+         qpos="
+           1.04719755 -1.57079633 1.57079633
+           -1.57079633 -1.57079633 0 0 0
+
+           -1.3275199 -1.98157239 1.85895165
+           -1.4445118 -1.57079633 0 0 0
+
+           -0.23 0.35 0.7566
+           0.7071067811865476 0 0.7071067811865476 0
+
+           0.23 0.35 0.7606
+           0.7071067811865476 0 0.7071067811865476 0
+         "
+         ctrl="
+           1.04719755 -1.57079633 1.57079633
+           -1.57079633 -1.57079633 0 0 0
+
+           -1.3275199 -1.98157239 1.85895165
+           -1.4445118 -1.57079633 0 0 0
+         "/>
+  </keyframe>
+</mujoco>

@@ -1,0 +1,10 @@
+bool execute
+---
+bool success
+string error_code
+string reason
+bool left_holding
+bool right_holding
+---
+string phase
+string detail

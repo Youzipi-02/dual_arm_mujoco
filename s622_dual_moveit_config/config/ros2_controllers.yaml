@@ -1,0 +1,106 @@
+# This config file is used by ros2_control
+controller_manager:
+  ros__parameters:
+    update_rate: 500  # Hz
+
+    left_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    right_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    left_gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    right_gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    left_ft_sensor_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+    right_ft_sensor_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+left_arm_controller:
+  ros__parameters:
+    joints:
+      - left_j1
+      - left_j2
+      - left_j3
+      - left_j4
+      - left_j5
+      - left_j6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+right_arm_controller:
+  ros__parameters:
+    joints:
+      - right_j1
+      - right_j2
+      - right_j3
+      - right_j4
+      - right_j5
+      - right_j6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+left_gripper_controller:
+  ros__parameters:
+    joints:
+      - left_finger1_joint
+      - left_finger2_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+right_gripper_controller:
+  ros__parameters:
+    joints:
+      - right_finger1_joint
+      - right_finger2_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+left_ft_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: left_ft_sensor
+    frame_id: left_ft_sensor_link
+
+right_ft_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: right_ft_sensor
+    frame_id: right_ft_sensor_link
+
+/**:
+  ros__parameters:
+    mujoco_plugins:
+      object_state_monitor:
+        type: "mujoco_ros2_control_plugins/FreeJointStatePublisherPlugin"
+        publish_rate: 20.0
+        body_names: [wire, copper_terminal]
+      mujoco_camera_plugin:
+        type: "mujoco_ros2_control_plugins/CameraPlugin"
+        camera_publish_rate: 60.0
+
+        global_camera:
+          frame_name: global_camera_optical_frame
+          info_topic: /global_camera/camera_info
+          image_topic: /global_camera/rgb/image_raw
+          depth_topic: /global_camera/depth/image_raw

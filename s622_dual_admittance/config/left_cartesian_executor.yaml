@@ -1,0 +1,11 @@
+/left_cartesian_follower/cartesian_pose_executor:
+  ros__parameters:
+    group_name: left_arm
+    tip_link: left_grasp_frame
+    joint_names: [left_j1, left_j2, left_j3, left_j4, left_j5, left_j6]
+    command_rate_hz: 100.0
+    ik_timeout_sec: 0.005
+    target_timeout_sec: 0.1
+    joint_state_timeout_sec: 0.05
+    command_horizon_sec: 0.01
+    max_joint_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
